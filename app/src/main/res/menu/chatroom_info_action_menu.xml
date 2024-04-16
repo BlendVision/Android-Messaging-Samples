@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/refresh_token"
+        android:enabled="true"
+        android:title="@string/refresh_token" />
+    <item
+        android:id="@+id/chatroom_info"
+        android:enabled="true"
+        android:title="@string/chatroom_info" />
+    <item
+        android:id="@+id/update_user"
+        android:enabled="true"
+        android:title="@string/refresh_user" />
+    <item
+        android:id="@+id/update_viewer_info"
+        android:enabled="true"
+        android:title="@string/update_viewer_info" />
+    <item
+        android:id="@+id/chatroom_mute"
+        android:enabled="true"
+        android:icon="@drawable/selector_square_2"
+        android:title="@string/mute_chatroom" />
+    <item
+        android:id="@+id/chatroom_unmute"
+        android:enabled="true"
+        android:icon="@drawable/selector_square_3"
+        android:title="@string/unmute_chatroom"
+        android:visible="false" />
+    <item
+        android:id="@+id/chatroom_pinned_message"
+        android:enabled="true"
+        android:icon="@drawable/selector_square_3"
+        android:title="@string/pinned_messages"
+        android:visible="false" />
+
+    <item
+        android:id="@+id/chatroom_blocked_user"
+        android:enabled="true"
+        android:icon="@drawable/selector_square_3"
+        android:title="@string/blocked_users"
+        android:visible="false" />
+</menu>

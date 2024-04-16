@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="white">#FFFFFF</color>
+    <color name="grey_95">#F2F2F2</color>
+    <color name="grey_90">#E5E5E5</color>
+    <color name="grey_80">#CCCCCC</color>
+    <color name="grey_70">#B2B2B2</color>
+    <color name="grey_60">#999999</color>
+    <color name="grey_50">#808080</color>
+    <color name="grey_40">#666666</color>
+    <color name="davys_grey">#595959</color>
+    <color name="grey_30">#4C4C4C</color>
+    <color name="grey">#414141</color>
+    <color name="grey_20">#333333</color>
+    <color name="grey_15">#262626</color>
+    <color name="grey_10">#1A1A1A</color>
+
+    <color name="black">#000000</color>
+
+    <color name="transparent">#00000000</color>
+    <color name="translucent_1">#11000000</color>
+    <color name="translucent_10">#11111111</color>
+    <color name="translucent_20">#22000000</color>
+    <color name="translucent_40">#44000000</color>
+
+    <color name="tea_green">#CCD5AE</color>
+    <color name="beige">#E9EDC9</color>
+    <color name="beige_darker">#e0e6b3</color>
+    <color name="cornsilk">#FEFAE0</color>
+    <color name="papaya_whip">#FAEDCD</color>
+    <color name="buff">#D4A373</color>
+</resources>

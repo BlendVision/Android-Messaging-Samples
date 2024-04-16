@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/message_action_delete"
+        android:enabled="true"
+        android:title="@string/delete" />
+    <item
+        android:id="@+id/message_action_pin"
+        android:enabled="true"
+        android:icon="@drawable/selector_square_2"
+        android:title="@string/pin" />
+    <item
+        android:id="@+id/message_action_unpin"
+        android:enabled="true"
+        android:icon="@drawable/selector_square_3"
+        android:title="@string/unpin"
+        android:visible="false" />
+    <item
+        android:id="@+id/message_action_block_user"
+        android:enabled="true"
+        android:icon="@drawable/selector_square_3"
+        android:title="@string/block_user" />
+
+    <item
+        android:id="@+id/message_action_unblock_user"
+        android:enabled="true"
+        android:icon="@drawable/selector_square_3"
+        android:title="@string/unblock_user"
+        android:visible="false" />
+</menu>
