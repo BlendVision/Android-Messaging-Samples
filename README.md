@@ -35,7 +35,7 @@ dependencyResolutionManagement {
 
 ```groovy
 dependencies {
-  implementation 'com.blendvision.chat:messaging:1.0.0'
+  implementation 'com.blendvision.chat:messaging:1.0.1'
 }
 ```
 
