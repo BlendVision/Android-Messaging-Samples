@@ -6,7 +6,7 @@
 - **minSdkVersion**: 24
 - **targetSdkVersion**: 34
 - **Kotlin Version**: 1.9.x or later
-- **Android Gradle Plugin**: 8.1.0 or lower
+- **Android Gradle Plugin**: 8.3.1 or lower
 
 ## Integration
 
@@ -35,7 +35,7 @@ dependencyResolutionManagement {
 
 ```groovy
 dependencies {
-  implementation 'com.blendvision.chat:messaging:1.0.1'
+  implementation 'com.blendvision.chat:messaging:1.0.2'
 }
 ```
 
