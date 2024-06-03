@@ -16,7 +16,6 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.blendvision.chat.messaging.common.presentation.BlockedUser
-import com.blendvision.chat.messaging.common.presentation.ChatRoomRole
 import com.blendvision.chat.messaging.common.presentation.CustomCounter
 import com.blendvision.chat.messaging.common.presentation.Message
 import com.blendvision.chat.messaging.common.presentation.MessageException
@@ -26,17 +25,17 @@ import com.blendvision.chat.messaging.common.presentation.TextMessage
 import com.blendvision.chat.messaging.common.presentation.User
 import com.blendvision.chat.messaging.message.presentation.state.ConnectionState
 import com.example.messagesdksampleapp.ChatroomInfo
-import com.example.messagesdksampleapp.listener.ChatroomInfoActionListener
 import com.example.messagesdksampleapp.ChatroomInfoType
 import com.example.messagesdksampleapp.ChatroomUser
-import com.example.messagesdksampleapp.activity.MainActivity
-import com.example.messagesdksampleapp.listener.MessageActionListener
 import com.example.messagesdksampleapp.MessageInfoData
-import com.example.messagesdksampleapp.listener.PinnedMessageDialogActionListener
 import com.example.messagesdksampleapp.R
+import com.example.messagesdksampleapp.activity.MainActivity
 import com.example.messagesdksampleapp.adapter.MessageAdapter
 import com.example.messagesdksampleapp.listener.BlockedUserDialogActionListener
+import com.example.messagesdksampleapp.listener.ChatroomInfoActionListener
 import com.example.messagesdksampleapp.listener.ChatroomPresenterListener
+import com.example.messagesdksampleapp.listener.MessageActionListener
+import com.example.messagesdksampleapp.listener.PinnedMessageDialogActionListener
 import com.example.messagesdksampleapp.presenter.ChatroomPresenter
 import com.google.android.material.textfield.TextInputEditText
 import java.sql.Date
@@ -55,6 +54,7 @@ class ChatroomFragment(chatRoomToken: String,
     private var recyclerView: RecyclerView? = null
     private var inputTextField: TextInputEditText? = null
     private var buttonSend: Button? = null
+    private var buttonUnlike: Button? = null
     private var buttonLike: Button? = null
     private var tvLikeCounter: TextView? = null
     private var buttonDisconnect: Button? = null
@@ -93,6 +93,7 @@ class ChatroomFragment(chatRoomToken: String,
         recyclerView = view?.findViewById(R.id.recycler_message)
         inputTextField = view?.findViewById(R.id.input)
         buttonSend = view?.findViewById(R.id.button_send)
+        buttonUnlike = view?.findViewById(R.id.button_un_like)
         buttonLike = view?.findViewById(R.id.button_like)
         tvLikeCounter = view?.findViewById(R.id.textview_like_counter)
         buttonDisconnect = view?.findViewById(R.id.button_disconnect)
@@ -209,6 +210,10 @@ class ChatroomFragment(chatRoomToken: String,
             inputTextField?.clearFocus()
         }
 
+        buttonUnlike?.setOnClickListener {
+            presenter.sendCustomMessage("UNLIKE")
+        }
+
         buttonLike?.setOnClickListener {
             presenter.sendCountableCustomMessage(CUSTOM_MESSAGE_KEY_LIKE, "CUSTOM MESSAGE")
         }
@@ -218,7 +223,6 @@ class ChatroomFragment(chatRoomToken: String,
     override fun onResume() {
         super.onResume()
         if (presenter.connectionState !is ConnectionState.CONNECTED) {
-            val roleType = if (chatroomUser.isAdmin) ChatRoomRole.ROLE_ADMIN else ChatRoomRole.ROLE_VIEWER
             viewLoading?.visibility = View.VISIBLE
             textNoHistoryMessage?.visibility = View.GONE
             inputTextField?.isEnabled = false
@@ -251,7 +255,7 @@ class ChatroomFragment(chatRoomToken: String,
                     val isCountableLike = message.customMessage?.increment?.key == CUSTOM_MESSAGE_KEY_LIKE
 
                     if (isNotCountableLike) {
-                        toast("${message.user.customName} Click Like", Toast.LENGTH_SHORT)
+                        toast("${message.user.customName} Click Unlike", Toast.LENGTH_SHORT)
                     } else if (isCountableLike) {
                         message.customMessage?.value?.let { customMessage ->
                             toast(
@@ -339,6 +343,7 @@ class ChatroomFragment(chatRoomToken: String,
                     if (chatroomUser.isAdmin.not()) {
                         inputTextField?.isEnabled = false
                         buttonSend?.isEnabled = false
+                        buttonUnlike?.isEnabled = false
                         buttonLike?.isEnabled = false
                         context?.let {
                             inputTextField?.setHint(R.string.chatroom_is_muted_hint)
@@ -349,6 +354,7 @@ class ChatroomFragment(chatRoomToken: String,
                     chatroomIsMuted = false
                     inputTextField?.isEnabled = true
                     buttonSend?.isEnabled = true
+                    buttonUnlike?.isEnabled = true
                     buttonLike?.isEnabled = true
                     context?.let {
                         inputTextField?.setHint(R.string.message_to_send_hint)
@@ -432,6 +438,7 @@ class ChatroomFragment(chatRoomToken: String,
                 chatroomInfoList.first { it.title == "Name" }.detail = chatroomUser.username
                 chatroomInfoList.first { it.title == "User ID" }.detail = chatroomUser.clientID
                 chatroomInfoList.first { it.title == "Device ID" }.detail = chatroomUser.deviceID
+                chatroomInfoList.first { it.title == "Role" }.detail = if (chatroomUser.isAdmin) "Admin" else "Viewer"
 
                 if (chatroomFirstConnect) {
                     presenter.getHistoryMessages()
@@ -465,6 +472,7 @@ class ChatroomFragment(chatRoomToken: String,
         if (chatroomIsMuted.not()) {
             inputTextField?.isEnabled = true
             buttonSend?.isEnabled = true
+            buttonUnlike?.isEnabled = true
             buttonLike?.isEnabled = true
             context?.let {
                 inputTextField?.setHint(R.string.message_to_send_hint)
