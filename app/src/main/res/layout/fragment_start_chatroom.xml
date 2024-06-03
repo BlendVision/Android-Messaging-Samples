@@ -36,7 +36,7 @@
         app:layout_constraintTop_toBottomOf="@id/toolbar">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/layout_api_token"
+            android:id="@+id/layout_chat_room_token"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
@@ -45,201 +45,121 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <TextView
-                android:id="@+id/label_api_token_title"
+                android:id="@+id/label_chat_room_token_title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="@string/api_token"
+                android:text="@string/chat_room_token"
                 android:textSize="@dimen/textview_title"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/text_api_token"
+                android:id="@+id/text_chat_room_token"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:hint="@string/api_token_field_hint"
+                android:hint="@string/chat_room_token_field_hint"
                 android:inputType="text"
                 android:textSize="@dimen/edittext_field"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/label_api_token_title" />
+                app:layout_constraintTop_toBottomOf="@id/label_chat_room_token_title" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/layout_org_id"
+            android:id="@+id/layout_refresh_token"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/layout_api_token">
+            app:layout_constraintTop_toBottomOf="@id/layout_chat_room_token">
 
             <TextView
-                android:id="@+id/label_org_id_title"
+                android:id="@+id/label_refresh_token_title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="@string/org_id"
+                android:text="@string/refresh_token"
                 android:textSize="@dimen/textview_title"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/text_org_id"
+                android:id="@+id/text_refresh_token"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:hint="@string/org_id_field_hint"
+                android:hint="@string/refresh_token_field_hint"
                 android:inputType="text"
                 android:textSize="@dimen/edittext_field"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/label_org_id_title" />
+                app:layout_constraintTop_toBottomOf="@id/label_refresh_token_title" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/layout_chatroom_id"
+            android:id="@+id/layout_update_interval"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/layout_org_id">
+            app:layout_constraintTop_toBottomOf="@id/layout_refresh_token">
 
             <TextView
-                android:id="@+id/label_chatroom_id_title"
+                android:id="@+id/label_update_interval_title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="@string/chatroom_id"
+                android:text="@string/update_interval_title"
                 android:textSize="@dimen/textview_title"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/text_chatroom_id"
+                android:id="@+id/text_update_interval"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:hint="@string/chatroom_id_field_hint"
-                android:inputType="text"
+                android:hint="@string/update_interval_field_hint"
+                android:inputType="number"
                 android:textSize="@dimen/edittext_field"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/label_chatroom_id_title" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/layout_username"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="36dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/layout_chatroom_id">
-
-            <TextView
-                android:id="@+id/label_username_title"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="@string/username"
-                android:textSize="@dimen/textview_title"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/text_username"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:hint="@string/username_field_hint"
-                android:inputType="text"
-                android:text="Testing"
-                android:textSize="@dimen/edittext_field"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/label_username_title" />
+                app:layout_constraintTop_toBottomOf="@id/label_update_interval_title" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/layout_device_id"
+            android:id="@+id/layout_batch_interval"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/layout_username">
+            app:layout_constraintTop_toBottomOf="@id/layout_update_interval">
 
             <TextView
-                android:id="@+id/label_device_id_title"
+                android:id="@+id/label_batch_interval_title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="@string/device_id"
+                android:text="@string/batch_interval_title"
                 android:textSize="@dimen/textview_title"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/text_device_id"
+                android:id="@+id/text_batch_interval"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="4dp"
-                android:enabled="false"
-                android:hint="@string/device_id_field_hint"
-                android:inputType="text"
+                android:hint="@string/batch_interval_field_hint"
+                android:inputType="number"
                 android:textSize="@dimen/edittext_field"
-                app:layout_constraintEnd_toStartOf="@id/button_generate_device_id"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/label_device_id_title" />
-
-            <Button
-                android:id="@+id/button_generate_device_id"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:backgroundTint="@color/selector_button"
-                android:text="@string/generate_device_id"
-                android:textColor="@color/black"
-                android:textSize="@dimen/button"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/layout_admin"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginVertical="10dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/layout_device_id">
-
-            <TextView
-                android:id="@+id/label_is_admin_title"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="@string/is_admin"
-                android:textSize="@dimen/textview_title"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/switch_is_admin"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/switch_is_admin"
-                android:layout_width="45dp"
-                android:layout_height="40dp"
-                android:checked="false"
-                android:theme="@style/SwitchTheme"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/label_is_admin_title"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/label_batch_interval_title" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
