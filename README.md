@@ -122,9 +122,18 @@ private val eventListener = object : EventListener {
   //This method is optional and can be overridden if needed.
   override fun onUpdateViewerInfoSuccess() {}
 
-  //This method is optional and can be overridden if needed.
+  //This method is optional and can be overridden if needed.[README.md](..%2F..%2FBlendVision%2Fbv4dev%2FREADME.md)
   override fun onUpdateUserSuccess() {}
 
+  //This method is optional and can be overridden if needed.
+  override fun onCustomCountersInit(customCounters: List<CustomCounter>) {}
+  
+  //This method is optional and can be overridden if needed.
+  override fun onCustomCountersUpdated(customCounters: List<CustomCounter>) {}
+
+  //This method is optional and can be overridden if needed.
+  override fun onCustomMessageCountUpdated(increment: Int, customCounters: CustomCounter) {}
+  
   override fun onError(exception: MessageException) {
     // Error exception
   }
@@ -133,31 +142,26 @@ private val eventListener = object : EventListener {
 
 ### 3. Create `BVMessageManager`
 
-- The `apiToken` and `bvOrgId` can be obtained from the BlendVision console.
+- The `chatRoomToken` and `refreshToken` can be obtained from the BlendVision api.
+- The `updateInterval` and `batchInterval` are optional parameters. The default values are 2000L and 5000L ms, respectively.
 
 ```kotlin
-  val messageManager = BVMessageManager.Builder(apiToken, orgId)
+  val messageManager = BVMessageManager.Builder(chatRoomToken, refreshToken)
   .setEventListener(eventListener)
   .setMessageListener(messageListener)
+  .setUpdateCustomMessageCountInterval(updateInterval)
+  .setBatchCountableCustomInterval(batchInterval)
   .build()
 ```
 
 ### 4. Connect to ChatRoom
 
-- The role types are: `ChatRoomRole.ROLE_UNSPECIFIED`, `ChatRoomRole.ROLE_VIEWER`, and `ChatRoomRole.ROLE_ADMIN`.
 - Upon successful connection, the status callback for `ConnectionState.CONNECTED` will be received in the `onChatRoomConnectionChanged` method.
+- When the connection is successful, the `onChatRoomConnectionChanged` method will be called.
+- When the countable custom message key is configured, the `onCustomCountersInit` method will be called.
 
 ```kotlin
-
-//Example usage:
-//Viewer
-val chatRoomUser = ChatRoomUser(userName = "Anthony", deviceId = UUID.randomUUID().toString(), role = ChatRoomRole.ROLE_VIEWER)
-messageManager.connect(chatRoomId = chatRoomId, chatRoomUser = chatRoomUser)
-
-//Admin
-val chatRoomUser = ChatRoomUser(userName = "Isaac", deviceId = UUID.randomUUID().toString(), role = ChatRoomRole.ROLE_ADMIN)
-messageManager.connect(chatRoomId = chatRoomId, chatRoomUser = chatRoomUser)
-
+messageManager.connect()
 ```
 
 ### 5. Publish message to ChatRoom
@@ -176,7 +180,17 @@ messageManager.connect(chatRoomId = chatRoomId, chatRoomUser = chatRoomUser)
  messageManager.publishCustomMessage(customMessage)
 ```
 
-### 7. Disconnect from ChatRoom
+### 7. Publish countable custom message to ChatRoom
+
+- When the publish countable custom message is successful,new message will be received in the `onReceiveMessage` method.
+- When the updateInterval is reached, the `onCustomMessageCountUpdated` method will be called.
+- The `message` is optional parameters.
+
+```kotlin
+messageManager.publishCountableCustomMessage(key, message)
+```
+
+### 8. Disconnect from ChatRoom
 
 - When the disconnection is successful, the status callback of `ConnectionState.DISCONNECTED` will be received in the `onChatRoomConnectionChanged`
   method.
@@ -202,7 +216,7 @@ messageManager.blockUser(userId, userDeviceId, userCustomName)
 messageManager.unblockUser(userId)
 
 // When delete message is successful, will be received in the `onDeleteMessageSuccess` method.
-messageManager.deleteMessage(messageId)
+messageManager.deleteMessage(messageId, userCustomName, timestampReceivedAt)
 
 // When pin message is successful, will be received in the `onPinMessageSuccess` method.
 messageManager.pinMessage(messageId, text, userId, userDeviceId, userCustomName)
