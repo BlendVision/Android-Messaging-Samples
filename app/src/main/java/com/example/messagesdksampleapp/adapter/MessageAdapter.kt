@@ -72,7 +72,7 @@ class MessageAdapter(private val chatroomUser: ChatroomUser, private val listene
                 popupMenu.setOnMenuItemClickListener {
                     when(it.itemId) {
                         R.id.message_action_delete -> {
-                            listener.onDeleteMessageClicked(message.messageInfo.id)
+                            listener.onDeleteMessageClicked(message.messageInfo.id, message.messageInfo.user.customName, message.messageInfo.timestampReceivedAt)
                             return@setOnMenuItemClickListener true
                         }
                         R.id.message_action_pin -> {
