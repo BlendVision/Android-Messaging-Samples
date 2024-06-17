@@ -1,8 +1,7 @@
 package com.example.messagesdksampleapp.presenter
 
 import android.icu.text.SimpleDateFormat
-import com.blendvision.chat.messaging.common.presentation.ChatRoomRole
-import com.blendvision.chat.messaging.common.presentation.ChatRoomUser
+import com.blendvision.chat.messaging.common.presentation.CustomCounter
 import com.blendvision.chat.messaging.common.presentation.MessageException
 import com.blendvision.chat.messaging.common.presentation.MessageInfo
 import com.blendvision.chat.messaging.message.presentation.BVMessageManager
@@ -13,12 +12,19 @@ import com.example.messagesdksampleapp.listener.ChatroomPresenterListener
 import java.util.Date
 import java.util.Locale
 
-class ChatroomPresenter(apiToken: String, orgID: String) : MessageListener, EventListener {
+class ChatroomPresenter(
+    chatRoomToken: String,
+    refreshToken: String? = null,
+    updateInterval: Long? = null,
+    batchInterval: Long? = null
+) : MessageListener, EventListener {
     private var listener: ChatroomPresenterListener? = null
     var connectionState: ConnectionState = ConnectionState.CONNECTING
-    private var messageManager = BVMessageManager.Builder(apiToken, orgID)
+    private var messageManager = BVMessageManager.Builder(chatRoomToken, refreshToken)
         .setEventListener(this)
         .setMessageListener(this)
+        .setUpdateCustomMessageCountInterval(updateInterval ?: 2000L)
+        .setBatchCountableCustomInterval(batchInterval ?: 5000L)
         .build()
 
     fun bind(listener: ChatroomPresenterListener) {
@@ -29,9 +35,8 @@ class ChatroomPresenter(apiToken: String, orgID: String) : MessageListener, Even
         this.listener = null
     }
 
-    fun connectChatroom(chatroomID: String, roleType: ChatRoomRole, username: String = "", deviceID: String) {
-        val user = ChatRoomUser(username, deviceID, roleType)
-        messageManager.connect(chatroomID, user)
+    fun connectChatroom() {
+        messageManager.connect()
     }
 
     fun disconnectChatroom() {
@@ -55,12 +60,16 @@ class ChatroomPresenter(apiToken: String, orgID: String) : MessageListener, Even
         messageManager.publishMessage(message)
     }
 
-    fun deleteMessage(messageID: String) {
-        messageManager.deleteMessage(messageID)
+    fun deleteMessage(messageID: String, userCustomName: String, timestampReceivedAt: String?) {
+        messageManager.deleteMessage(messageID, userCustomName, timestampReceivedAt)
     }
 
     fun sendCustomMessage(customMessage: String) {
         messageManager.publishCustomMessage(customMessage)
+    }
+
+    fun sendCountableCustomMessage(key: String, value: String? = null) {
+        messageManager.publishCountableCustomMessage(key, value)
     }
 
     fun pinMessage(messageID: String, text: String, userID: String, userDeviceID: String, userCustomName: String) {
@@ -122,5 +131,17 @@ class ChatroomPresenter(apiToken: String, orgID: String) : MessageListener, Even
 
     override fun onReceiveMessage(messages: List<MessageInfo>) {
         listener?.onReceiveMessage(messages)
+    }
+
+    override fun onCustomCountersInit(customCounters: List<CustomCounter>) {
+        listener?.onCustomCountersInit(customCounters)
+    }
+
+    override fun onCustomCountersUpdated(customCounters: List<CustomCounter>) {
+        listener?.onCustomCountersUpdated(customCounters)
+    }
+
+    override fun onCustomMessageCountUpdated(increment: Int, customCounters: CustomCounter) {
+        listener?.onCustomMessageCountUpdated(increment, customCounters)
     }
 }

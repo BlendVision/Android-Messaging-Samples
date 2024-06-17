@@ -16,7 +16,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.blendvision.chat.messaging.common.presentation.BlockedUser
-import com.blendvision.chat.messaging.common.presentation.ChatRoomRole
+import com.blendvision.chat.messaging.common.presentation.CustomCounter
 import com.blendvision.chat.messaging.common.presentation.Message
 import com.blendvision.chat.messaging.common.presentation.MessageException
 import com.blendvision.chat.messaging.common.presentation.MessageInfo
@@ -25,17 +25,17 @@ import com.blendvision.chat.messaging.common.presentation.TextMessage
 import com.blendvision.chat.messaging.common.presentation.User
 import com.blendvision.chat.messaging.message.presentation.state.ConnectionState
 import com.example.messagesdksampleapp.ChatroomInfo
-import com.example.messagesdksampleapp.listener.ChatroomInfoActionListener
 import com.example.messagesdksampleapp.ChatroomInfoType
-import com.example.messagesdksampleapp.activity.MainActivity
-import com.example.messagesdksampleapp.listener.MessageActionListener
-import com.example.messagesdksampleapp.MessageInfoData
-import com.example.messagesdksampleapp.listener.PinnedMessageDialogActionListener
-import com.example.messagesdksampleapp.R
 import com.example.messagesdksampleapp.ChatroomUser
+import com.example.messagesdksampleapp.MessageInfoData
+import com.example.messagesdksampleapp.R
+import com.example.messagesdksampleapp.activity.MainActivity
 import com.example.messagesdksampleapp.adapter.MessageAdapter
 import com.example.messagesdksampleapp.listener.BlockedUserDialogActionListener
+import com.example.messagesdksampleapp.listener.ChatroomInfoActionListener
 import com.example.messagesdksampleapp.listener.ChatroomPresenterListener
+import com.example.messagesdksampleapp.listener.MessageActionListener
+import com.example.messagesdksampleapp.listener.PinnedMessageDialogActionListener
 import com.example.messagesdksampleapp.presenter.ChatroomPresenter
 import com.google.android.material.textfield.TextInputEditText
 import java.sql.Date
@@ -43,14 +43,20 @@ import java.sql.Timestamp
 import java.util.Locale
 
 private const val FRAGMENT: String = "ChatroomFragment"
-class ChatroomFragment(private val chatroomUser: ChatroomUser, private val deviceID: String, private val chatroomID: String, apiToken: String, orgID: String) : Fragment(), ChatroomPresenterListener,
+private const val CUSTOM_MESSAGE_KEY_LIKE = "LIKE"
+class ChatroomFragment(chatRoomToken: String,
+                       private val refreshToken: String? = null, updateInterval: Long?, batchInterval: Long?) : Fragment(), ChatroomPresenterListener,
     MessageActionListener, ChatroomInfoActionListener, PinnedMessageDialogActionListener, BlockedUserDialogActionListener {
+    private var chatroomID = ""
+    private val chatroomUser = ChatroomUser()
     private var textConnectionState: TextView? = null
     private var textNoHistoryMessage: TextView? = null
     private var recyclerView: RecyclerView? = null
     private var inputTextField: TextInputEditText? = null
     private var buttonSend: Button? = null
+    private var buttonUnlike: Button? = null
     private var buttonLike: Button? = null
+    private var tvLikeCounter: TextView? = null
     private var buttonDisconnect: Button? = null
     private var buttonInfo: Button? = null
     private var viewLoading: View? = null
@@ -58,7 +64,7 @@ class ChatroomFragment(private val chatroomUser: ChatroomUser, private val devic
     private var pinnedMessageDialogFragment: PinnedMessageDialogFragment? = null
     private var blockedUserDialogFragment: BlockedUserDialogFragment? = null
     private var errorMessageDialogFragment: ErrorMessageDialogFragment? = null
-    private val presenter = ChatroomPresenter(apiToken, orgID)
+    private val presenter = ChatroomPresenter(chatRoomToken, refreshToken, updateInterval, batchInterval)
     private val adapter = MessageAdapter(chatroomUser, this)
     private val blockedUsers = mutableListOf<BlockedUser>()
     private val pinnedMessages = mutableListOf<Message>()
@@ -69,7 +75,7 @@ class ChatroomFragment(private val chatroomUser: ChatroomUser, private val devic
     private var chatroomInfoList: MutableList<ChatroomInfo> = arrayListOf(
         ChatroomInfo("User", "", ChatroomInfoType.Section),
         ChatroomInfo("Name", chatroomUser.username),
-        ChatroomInfo("User ID", chatroomUser.deviceID),
+        ChatroomInfo("User ID", chatroomUser.clientID),
         ChatroomInfo("Device ID", chatroomUser.deviceID),
         ChatroomInfo("Role", if (chatroomUser.isAdmin) "Admin" else "Viewer"),
         ChatroomInfo("Info", "",  ChatroomInfoType.Section),
@@ -87,7 +93,9 @@ class ChatroomFragment(private val chatroomUser: ChatroomUser, private val devic
         recyclerView = view?.findViewById(R.id.recycler_message)
         inputTextField = view?.findViewById(R.id.input)
         buttonSend = view?.findViewById(R.id.button_send)
+        buttonUnlike = view?.findViewById(R.id.button_un_like)
         buttonLike = view?.findViewById(R.id.button_like)
+        tvLikeCounter = view?.findViewById(R.id.textview_like_counter)
         buttonDisconnect = view?.findViewById(R.id.button_disconnect)
         buttonInfo = view?.findViewById(R.id.button_info)
         viewLoading = view?.findViewById(R.id.view_loading)
@@ -117,6 +125,7 @@ class ChatroomFragment(private val chatroomUser: ChatroomUser, private val devic
             popupMenu.menu.findItem(R.id.update_viewer_info).isEnabled = viewerInfoHasUpdated
             popupMenu.menu.findItem(R.id.chatroom_blocked_user).isVisible = chatroomUser.isAdmin && blockedUsers.isNotEmpty()
             popupMenu.menu.findItem(R.id.chatroom_pinned_message).isVisible = chatroomUser.isAdmin && pinnedMessages.isNotEmpty()
+            popupMenu.menu.findItem(R.id.refresh_token).isVisible = !refreshToken.isNullOrEmpty()
 
             popupMenu.setOnMenuItemClickListener {
                 when (it.itemId) {
@@ -190,7 +199,7 @@ class ChatroomFragment(private val chatroomUser: ChatroomUser, private val devic
                         User(chatroomUser.clientID, chatroomUser.deviceID, chatroomUser.username, chatroomUser.isAdmin, true),
                         MessageType.INTERACTION_TYPE_TEXT.toString(),
                         TextMessage(inputTextField?.text.toString(), false),
-                        null, null, null, null, null, null,
+                        null, null,null, null, null, null, null,
                         "", "", "", "",
                         0L, sendTime, 0L, 0L),
                     true))
@@ -201,8 +210,12 @@ class ChatroomFragment(private val chatroomUser: ChatroomUser, private val devic
             inputTextField?.clearFocus()
         }
 
+        buttonUnlike?.setOnClickListener {
+            presenter.sendCustomMessage("UNLIKE")
+        }
+
         buttonLike?.setOnClickListener {
-            presenter.sendCustomMessage("LIKE")
+            presenter.sendCountableCustomMessage(CUSTOM_MESSAGE_KEY_LIKE, "CUSTOM MESSAGE")
         }
         presenter.bind(this)
     }
@@ -210,7 +223,6 @@ class ChatroomFragment(private val chatroomUser: ChatroomUser, private val devic
     override fun onResume() {
         super.onResume()
         if (presenter.connectionState !is ConnectionState.CONNECTED) {
-            val roleType = if (chatroomUser.isAdmin) ChatRoomRole.ROLE_ADMIN else ChatRoomRole.ROLE_VIEWER
             viewLoading?.visibility = View.VISIBLE
             textNoHistoryMessage?.visibility = View.GONE
             inputTextField?.isEnabled = false
@@ -219,7 +231,7 @@ class ChatroomFragment(private val chatroomUser: ChatroomUser, private val devic
                 inputTextField?.setHint(R.string.disable_send_message_hint)
             }
             presenter.disconnectChatroom()
-            presenter.connectChatroom(chatroomID, roleType, chatroomUser.username, deviceID)
+            presenter.connectChatroom()
         }
     }
 
@@ -239,10 +251,23 @@ class ChatroomFragment(private val chatroomUser: ChatroomUser, private val devic
         messages.forEach { message ->
             when (message.type) {
                 MessageType.INTERACTION_TYPE_CUSTOM.toString() -> {
-                    if (message.customMessage?.value == "LIKE") {
-                        toast("${message.user.customName} Click Like", Toast.LENGTH_SHORT)
+                    val isNotCountableLike = message.customMessage?.increment == null && message.customMessage?.value != CUSTOM_MESSAGE_KEY_LIKE
+                    val isCountableLike = message.customMessage?.increment?.key == CUSTOM_MESSAGE_KEY_LIKE
+
+                    if (isNotCountableLike) {
+                        toast("${message.user.customName} Click Unlike", Toast.LENGTH_SHORT)
+                    } else if (isCountableLike) {
+                        message.customMessage?.value?.let { customMessage ->
+                            toast(
+                                "${message.user.customName} Click Countable Like, Custom message: $customMessage",
+                                Toast.LENGTH_SHORT
+                            )
+                        } ?: toast("${message.user.customName} Click Countable Like", Toast.LENGTH_SHORT)
                     } else {
-                        toast("${message.user.customName} Send Other Custom Message", Toast.LENGTH_SHORT)
+                        toast(
+                            "${message.user.customName} Send Other Custom Message",
+                            Toast.LENGTH_SHORT
+                        )
                     }
                 }
                 MessageType.INTERACTION_TYPE_ENTRANCE.toString() -> {
@@ -318,6 +343,7 @@ class ChatroomFragment(private val chatroomUser: ChatroomUser, private val devic
                     if (chatroomUser.isAdmin.not()) {
                         inputTextField?.isEnabled = false
                         buttonSend?.isEnabled = false
+                        buttonUnlike?.isEnabled = false
                         buttonLike?.isEnabled = false
                         context?.let {
                             inputTextField?.setHint(R.string.chatroom_is_muted_hint)
@@ -328,6 +354,7 @@ class ChatroomFragment(private val chatroomUser: ChatroomUser, private val devic
                     chatroomIsMuted = false
                     inputTextField?.isEnabled = true
                     buttonSend?.isEnabled = true
+                    buttonUnlike?.isEnabled = true
                     buttonLike?.isEnabled = true
                     context?.let {
                         inputTextField?.setHint(R.string.message_to_send_hint)
@@ -343,7 +370,7 @@ class ChatroomFragment(private val chatroomUser: ChatroomUser, private val devic
                     viewerInfoHasUpdated = true
                     viewerInfoEnable = message.viewerInfo?.enabled == true
                     chatroomInfoList.first { it.title == "Name" }.detail = chatroomUser.username
-                    chatroomInfoList.first { it.title == "User ID" }.detail = chatroomUser.deviceID
+                    chatroomInfoList.first { it.title == "User ID" }.detail = chatroomUser.clientID
                     chatroomInfoList.first { it.title == "Device ID" }.detail = chatroomUser.deviceID
                     chatroomInfoList.first { it.title == "Role" }.detail = if (chatroomUser.isAdmin) "Admin" else "Viewer"
                     chatroomInfoList.first { it.title == "Viewer Info Enable" }.detail = (message.viewerInfo?.enabled == true).toString()
@@ -393,10 +420,12 @@ class ChatroomFragment(private val chatroomUser: ChatroomUser, private val devic
 
             is ConnectionState.CONNECTED -> {
                 chatroomUser.username = connectionState.chatRoomInfo.self.customName
-                chatroomUser.clientID = connectionState.chatRoomInfo.self.deviceId
+                chatroomUser.clientID = connectionState.chatRoomInfo.self.customerId
                 chatroomUser.deviceID = connectionState.chatRoomInfo.self.deviceId
+                chatroomUser.isAdmin = connectionState.chatRoomInfo.self.isAdmin
                 chatroomUser.isBlock = connectionState.chatRoomInfo.blockedUsers.indexOfFirst { it.deviceId == chatroomUser.deviceID } != -1
                 chatroomIsMuted = connectionState.chatRoomInfo.muted
+                chatroomID = connectionState.chatRoomInfo.id
 
                 connectionState.chatRoomInfo.blockedUsers.forEach {
                     blockedUsers.add(it)
@@ -407,8 +436,9 @@ class ChatroomFragment(private val chatroomUser: ChatroomUser, private val devic
                 }
 
                 chatroomInfoList.first { it.title == "Name" }.detail = chatroomUser.username
-                chatroomInfoList.first { it.title == "User ID" }.detail = chatroomUser.deviceID
+                chatroomInfoList.first { it.title == "User ID" }.detail = chatroomUser.clientID
                 chatroomInfoList.first { it.title == "Device ID" }.detail = chatroomUser.deviceID
+                chatroomInfoList.first { it.title == "Role" }.detail = if (chatroomUser.isAdmin) "Admin" else "Viewer"
 
                 if (chatroomFirstConnect) {
                     presenter.getHistoryMessages()
@@ -442,6 +472,7 @@ class ChatroomFragment(private val chatroomUser: ChatroomUser, private val devic
         if (chatroomIsMuted.not()) {
             inputTextField?.isEnabled = true
             buttonSend?.isEnabled = true
+            buttonUnlike?.isEnabled = true
             buttonLike?.isEnabled = true
             context?.let {
                 inputTextField?.setHint(R.string.message_to_send_hint)
@@ -481,6 +512,34 @@ class ChatroomFragment(private val chatroomUser: ChatroomUser, private val devic
         toast("Refresh token success")
     }
 
+    override fun onCustomCountersInit(customCounters: List<CustomCounter>) {
+        Log.d(FRAGMENT, "onCustomMessageCountsInit $customCounters")
+        for (customCounter in customCounters) {
+            if (customCounter.key == CUSTOM_MESSAGE_KEY_LIKE) {
+                tvLikeCounter?.text = customCounter.value.toString()
+            }
+        }
+        toast("Custom Message Counts Init")
+    }
+
+    override fun onCustomCountersUpdated(customCounters: List<CustomCounter>) {
+        Log.d(FRAGMENT, "onCustomCountersUpdated $customCounters")
+        for(customCounter in customCounters) {
+            if (customCounter.key == CUSTOM_MESSAGE_KEY_LIKE) {
+                tvLikeCounter?.text = customCounter.value.toString()
+            }
+        }
+        toast("Custom Counters Updated")
+    }
+
+    override fun onCustomMessageCountUpdated(increment: Int, customCounters: CustomCounter) {
+        Log.d(FRAGMENT, "onCustomMessageCountUpdated $increment $customCounters")
+        if (customCounters.key == CUSTOM_MESSAGE_KEY_LIKE) {
+            tvLikeCounter?.text = customCounters.value.toString()
+        }
+        toast("Custom Message Count Updated")
+    }
+
     override fun onError(exception: MessageException) {
         Log.d(FRAGMENT, "onError $exception")
         errorMessageDialogFragment?.dismiss()
@@ -495,13 +554,11 @@ class ChatroomFragment(private val chatroomUser: ChatroomUser, private val devic
             MessageException.ERROR_REASON_TOKEN_EXPIRED.second -> {
                 errorMessageDialogFragment = ErrorMessageDialogFragment(exception.code.toString(), exception.errorMessage, exception.reason, {
                     Log.d(FRAGMENT, "Reconnect chatroom")
-                    val roleType = if (chatroomUser.isAdmin) ChatRoomRole.ROLE_ADMIN else ChatRoomRole.ROLE_VIEWER
-                    presenter.connectChatroom(chatroomID, roleType, chatroomUser.username, chatroomUser.deviceID)
+                    presenter.connectChatroom()
                     errorMessageDialogFragment?.dismiss()
                 }, {
                     Log.d(FRAGMENT, "Reconnect chatroom")
-                    val roleType = if (chatroomUser.isAdmin) ChatRoomRole.ROLE_ADMIN else ChatRoomRole.ROLE_VIEWER
-                    presenter.connectChatroom(chatroomID, roleType, chatroomUser.username, chatroomUser.deviceID)
+                    presenter.connectChatroom()
                 })
             }
             else -> {
@@ -512,9 +569,13 @@ class ChatroomFragment(private val chatroomUser: ChatroomUser, private val devic
     }
 
     /* MessageActionListener */
-    override fun onDeleteMessageClicked(messageID: String) {
+    override fun onDeleteMessageClicked(
+        messageID: String,
+        userCustomName: String,
+        timestampReceivedAt: String?
+    ) {
         Log.d(FRAGMENT, "message view holder onDeleteMessageClicked: $messageID")
-        presenter.deleteMessage(messageID)
+        presenter.deleteMessage(messageID, userCustomName, timestampReceivedAt)
     }
 
     override fun onPinMessageClicked(
