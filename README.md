@@ -35,7 +35,7 @@ dependencyResolutionManagement {
 
 ```groovy
 dependencies {
-  implementation 'com.blendvision.chat:messaging:1.0.4'
+  implementation 'com.blendvision.chat:messaging:1.0.5'
 }
 ```
 
@@ -133,9 +133,17 @@ private val eventListener = object : EventListener {
 
   //This method is optional and can be overridden if needed.
   override fun onCustomMessageCountUpdated(increment: Int, customCounters: CustomCounter) {}
+
+  //This method is optional and can be overridden if needed.
+  override fun onGetMessagesSuccess(messages: List<MessageInfo>) {}
   
   override fun onError(exception: MessageException) {
     // Error exception
+  }
+  
+  // Called when get self info success.
+  override fun onGetSelfInfoSuccess(self: Self) {
+    // For more information, see Self class
   }
 }
 ```
@@ -231,6 +239,9 @@ messageManager.updateViewerInfo(enabled, customName)
 messageManager.updateUser(customName)
 
 // When get chat history is successful, will be received in the `onGetChatHistorySuccess` method.
-messageManager.getChatHistory(beforeAt, limit)
+messageManager.getChatHistory(beforeAt, limit, afterAt, fromOldest)
+
+// When get message is successful, will be received in the `onGetMessagesSuccess` method.
+messageManager.getMessages(beforeAt, limit, afterAt, fromOldest)
 
 ```
