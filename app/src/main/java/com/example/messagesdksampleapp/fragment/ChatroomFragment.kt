@@ -21,6 +21,7 @@ import com.blendvision.chat.messaging.common.presentation.Message
 import com.blendvision.chat.messaging.common.presentation.MessageException
 import com.blendvision.chat.messaging.common.presentation.MessageInfo
 import com.blendvision.chat.messaging.common.presentation.MessageType
+import com.blendvision.chat.messaging.common.presentation.Self
 import com.blendvision.chat.messaging.common.presentation.TextMessage
 import com.blendvision.chat.messaging.common.presentation.User
 import com.blendvision.chat.messaging.message.presentation.state.ConnectionState
@@ -38,6 +39,7 @@ import com.example.messagesdksampleapp.listener.MessageActionListener
 import com.example.messagesdksampleapp.listener.PinnedMessageDialogActionListener
 import com.example.messagesdksampleapp.presenter.ChatroomPresenter
 import com.google.android.material.textfield.TextInputEditText
+import com.google.gson.Gson
 import java.sql.Date
 import java.sql.Timestamp
 import java.util.Locale
@@ -194,12 +196,12 @@ class ChatroomFragment(chatRoomToken: String,
             }
             if (chatroomUser.isBlock) {
                 val sendTime = System.currentTimeMillis() / 1000
-                adapter.messages.add(MessageInfoData(
+                adapter.addMessageInfoData(MessageInfoData(
                     MessageInfo("",
                         User(chatroomUser.clientID, chatroomUser.deviceID, chatroomUser.username, chatroomUser.isAdmin, true),
                         MessageType.INTERACTION_TYPE_TEXT.toString(),
                         TextMessage(inputTextField?.text.toString(), false),
-                        null, null,null, null, null, null, null,
+                        null, null,null, null, null, null, null, null,
                         "", "", "", "",
                         0L, sendTime, 0L, 0L),
                     true))
@@ -238,6 +240,7 @@ class ChatroomFragment(chatRoomToken: String,
     override fun onDestroy() {
         presenter.unbind()
         presenter.disconnectChatroom()
+        presenter.stopGettingMessagesPeriodically()
         super.onDestroy()
     }
 
@@ -276,7 +279,7 @@ class ChatroomFragment(chatRoomToken: String,
                 MessageType.INTERACTION_TYPE_DELETE_MESSAGE.toString() -> {
                     val deleteMessageIndex = adapter.messages.indexOfFirst { it.messageInfo.id == message.deleteMessage!!.id }
                     if (deleteMessageIndex != -1) {
-                        adapter.messages.removeAt(deleteMessageIndex)
+                        adapter.removeMessageInfoAt(deleteMessageIndex)
                         adapter.notifyItemChanged(deleteMessageIndex)
                     }
                 }
@@ -380,8 +383,11 @@ class ChatroomFragment(chatRoomToken: String,
                         chatroomInfoList.first { it.title == "Update At" }.detail = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date(Timestamp(timestamp * 1000).time))
                     }
                 }
+                MessageType.INTERACTION_TYPE_BROADCAST_UPDATE.toString() -> {
+                    toast("Concurrent viewer count: ${message.broadcastMessage?.viewerMetrics?.concurrent?.count}, Total viewer count: ${message.broadcastMessage?.viewerMetrics?.total?.count}", Toast.LENGTH_SHORT)
+                }
             }
-            adapter.messages.add(MessageInfoData(message, message.user.blocked))
+            adapter.addMessageInfoData(MessageInfoData(message, message.user.blocked))
 
             Log.d(FRAGMENT, "$name ${message.id}")
             Log.d(FRAGMENT, "$name ${message.textMessage}")
@@ -397,7 +403,6 @@ class ChatroomFragment(chatRoomToken: String,
             Log.d(FRAGMENT, "$name -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -")
         }
 
-        adapter.messages.sortBy { it.messageInfo.timestampSentAt }
         adapter.notifyItemRangeChanged(0, adapter.itemCount)
         recyclerView?.scrollToPosition(adapter.itemCount - 1)
 
@@ -457,7 +462,7 @@ class ChatroomFragment(chatRoomToken: String,
         Log.d(FRAGMENT, "onGetChatHistorySuccess")
         val beforeIndex = adapter.messages.size
         messages.forEach {
-            adapter.messages.add(MessageInfoData(it,
+            adapter.addMessageInfoData(MessageInfoData(it,
                 blockedUsers.indexOfFirst { user -> user.id == it.user.id } != -1,
                 pinnedMessages.indexOfFirst { m -> m.id == it.id } != -1))
             Log.d(FRAGMENT, "Text: ${it.textMessage?.text}, ${it.user.blocked}")
@@ -484,13 +489,15 @@ class ChatroomFragment(chatRoomToken: String,
         }
         adapter.notifyItemRangeChanged(beforeIndex, adapter.itemCount)
         recyclerView?.scrollToPosition(adapter.itemCount - 1)
+
+        presenter.startGettingMessagesPeriodically()
     }
 
     override fun onDeleteMessageSuccess(messageId: String) {
         Log.d(FRAGMENT, "onDeleteMessageSuccess: $messageId")
         val deletedMessageIndex = adapter.messages.indexOfFirst { it.messageInfo.id == messageId }
         if (deletedMessageIndex != -1) {
-            adapter.messages.removeAt(deletedMessageIndex)
+            adapter.removeMessageInfoAt(deletedMessageIndex)
             adapter.notifyItemChanged(deletedMessageIndex)
         }
         toast("Delete message success")
@@ -538,6 +545,20 @@ class ChatroomFragment(chatRoomToken: String,
             tvLikeCounter?.text = customCounters.value.toString()
         }
         toast("Custom Message Count Updated")
+    }
+
+    override fun onGetSelfInfoSuccess(self: Self) {
+        Log.d(FRAGMENT, "onGetSelfInfoSuccess $self")
+        toast("Get Self Info Success, User ID: ${self.customerId}")
+    }
+
+    override fun onGetMessagesSuccess(messages: List<MessageInfo>) {
+        Log.d(FRAGMENT, "onGetMessagesSuccess ${Gson().toJson(messages)}")
+        val isAdded = adapter.addMessages(messages)
+        if (isAdded) {
+            adapter.notifyItemRangeChanged(0, adapter.itemCount)
+            recyclerView?.scrollToPosition(adapter.itemCount - 1)
+        }
     }
 
     override fun onError(exception: MessageException) {

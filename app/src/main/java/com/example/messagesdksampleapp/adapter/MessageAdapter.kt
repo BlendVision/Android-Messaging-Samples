@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
+import com.blendvision.chat.messaging.common.presentation.MessageInfo
 import com.blendvision.chat.messaging.common.presentation.MessageType
 import com.example.messagesdksampleapp.listener.MessageActionListener
 import com.example.messagesdksampleapp.MessageInfoData
@@ -16,7 +17,10 @@ import com.example.messagesdksampleapp.viewHolder.MessageOtherViewHolder
 import com.example.messagesdksampleapp.viewHolder.MessageUpdateViewHolder
 
 class MessageAdapter(private val chatroomUser: ChatroomUser, private val listener: MessageActionListener) : RecyclerView.Adapter<MessageBaseViewHolder>() {
-    val messages = mutableListOf<MessageInfoData>()
+    private val _messages = mutableListOf<MessageInfoData>()
+    val messages: List<MessageInfoData> = _messages
+    private val _messagesIdSet: MutableSet<String> = mutableSetOf()
+
     enum class MessageDisplayType(val num: Int) {
         MY(0),
         ADMIN(1),
@@ -99,5 +103,33 @@ class MessageAdapter(private val chatroomUser: ChatroomUser, private val listene
             }
         }
         holder.bind(message, chatroomUser.isAdmin)
+    }
+
+    fun addMessages(messageList: List<MessageInfo>): Boolean {
+        var isAdded = false
+        messageList.forEach { message ->
+            val messageInfoData = MessageInfoData(message, message.user.blocked)
+            if (isAdded) {
+                addMessageInfoData(messageInfoData)
+            } else {
+                isAdded = addMessageInfoData(messageInfoData)
+            }
+        }
+        return isAdded
+    }
+
+    fun addMessageInfoData(messageInfoData: MessageInfoData): Boolean {
+        val isAdded = _messagesIdSet.add(messageInfoData.messageInfo.id)
+         if (isAdded) {
+            _messages.add(messageInfoData)
+            _messages.sortBy { it.messageInfo.timestampReceivedAt }
+        }
+        return isAdded
+    }
+
+    fun removeMessageInfoAt(index: Int) {
+        val messageId = _messages[index].messageInfo.id
+        _messages.removeAt(index)
+        _messagesIdSet.remove(messageId)
     }
 }
