@@ -45,7 +45,7 @@ import java.sql.Timestamp
 import java.util.Locale
 
 private const val FRAGMENT: String = "ChatroomFragment"
-private const val CUSTOM_MESSAGE_KEY_LIKE = "LIKE"
+private const val CUSTOM_MESSAGE_KEY_LIKE = "like"
 class ChatroomFragment(chatRoomToken: String,
                        private val refreshToken: String? = null, updateInterval: Long?, batchInterval: Long?) : Fragment(), ChatroomPresenterListener,
     MessageActionListener, ChatroomInfoActionListener, PinnedMessageDialogActionListener, BlockedUserDialogActionListener {
@@ -389,17 +389,19 @@ class ChatroomFragment(chatRoomToken: String,
             }
             adapter.addMessageInfoData(MessageInfoData(message, message.user.blocked))
 
-            Log.d(FRAGMENT, "$name ${message.id}")
-            Log.d(FRAGMENT, "$name ${message.textMessage}")
-            Log.d(FRAGMENT, "$name ${message.type}")
-            Log.d(FRAGMENT, "$name ${message.user.id}, ${message.user.deviceId}, ${messages[0].user.customName}, ${messages[0].user.isAdmin}, ${messages[0].user.blocked}")
-            Log.d(FRAGMENT, "$name ${message.blockUnblockUser}")
-            Log.d(FRAGMENT, "$name ${message.deleteMessage}")
-            Log.d(FRAGMENT, "$name ${message.pinUnpinMessage}")
-            Log.d(FRAGMENT, "$name ${message.customMessage}")
-            Log.d(FRAGMENT, "$name ${message.timestampSentAt}")
-            Log.d(FRAGMENT, "$name ${message.unixTimestampSentAt}")
-            Log.d(FRAGMENT, "$name ${message.viewerInfo?.count}")
+            Log.d(FRAGMENT, "$name id: ${message.id}")
+            Log.d(FRAGMENT, "$name textMessage: ${message.textMessage}")
+            Log.d(FRAGMENT, "$name type: ${message.type}")
+            Log.d(FRAGMENT, "$name user.id: ${message.user.id}, deviceId: ${message.user.deviceId}, customName: ${messages[0].user.customName}, isAdmin: ${messages[0].user.isAdmin}, blocked: ${messages[0].user.blocked}")
+            Log.d(FRAGMENT, "$name entranceMessage: ${message.entranceMessage}")
+            Log.d(FRAGMENT, "$name broadcastMessage: ${message.broadcastMessage}")
+            Log.d(FRAGMENT, "$name blockUnblockUser: ${message.blockUnblockUser}")
+            Log.d(FRAGMENT, "$name deleteMessage: ${message.deleteMessage}")
+            Log.d(FRAGMENT, "$name pinUnpinMessage: ${message.pinUnpinMessage}")
+            Log.d(FRAGMENT, "$name customMessage: ${message.customMessage}")
+            Log.d(FRAGMENT, "$name timestampSentAt: ${message.timestampSentAt}")
+            Log.d(FRAGMENT, "$name unixTimestampSentAt: ${message.unixTimestampSentAt}")
+            Log.d(FRAGMENT, "$name viewerInfo.count: ${message.viewerInfo?.count}")
             Log.d(FRAGMENT, "$name -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -")
         }
 
