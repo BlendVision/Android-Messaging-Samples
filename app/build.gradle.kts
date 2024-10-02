@@ -25,7 +25,7 @@ android {
         }
 
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -57,12 +57,12 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
+    implementation("com.google.code.gson:gson:2.10.1")
+    implementation("com.auth0.android:jwtdecode:2.0.2")
+    implementation("com.hivemq:hivemq-mqtt-client:1.3.3")
+    implementation("com.hivemq:hivemq-mqtt-client-websocket:1.3.3")
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
-    implementation("com.google.code.gson:gson:2.10.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
-    implementation("com.hivemq:hivemq-mqtt-client:1.3.3")
-    implementation("com.hivemq:hivemq-mqtt-client-websocket:1.3.3")
-    implementation("com.auth0.android:jwtdecode:2.0.2")
 }
