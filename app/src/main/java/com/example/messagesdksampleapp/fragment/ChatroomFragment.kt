@@ -213,11 +213,11 @@ class ChatroomFragment(chatRoomToken: String,
         }
 
         buttonUnlike?.setOnClickListener {
-            presenter.sendCustomMessage("UNLIKE")
+            presenter.sendCustomMessage("{\"type\":\"unlike\"}")
         }
 
         buttonLike?.setOnClickListener {
-            presenter.sendCountableCustomMessage(CUSTOM_MESSAGE_KEY_LIKE, "CUSTOM MESSAGE")
+            presenter.sendCountableCustomMessage(CUSTOM_MESSAGE_KEY_LIKE, "{\"type\":\"like\"}")
         }
         presenter.bind(this)
     }
@@ -399,6 +399,7 @@ class ChatroomFragment(chatRoomToken: String,
             Log.d(FRAGMENT, "$name deleteMessage: ${message.deleteMessage}")
             Log.d(FRAGMENT, "$name pinUnpinMessage: ${message.pinUnpinMessage}")
             Log.d(FRAGMENT, "$name customMessage: ${message.customMessage}")
+            Log.d(FRAGMENT, "$name customMessage.value: ${message.customMessage?.value}")
             Log.d(FRAGMENT, "$name timestampSentAt: ${message.timestampSentAt}")
             Log.d(FRAGMENT, "$name unixTimestampSentAt: ${message.unixTimestampSentAt}")
             Log.d(FRAGMENT, "$name viewerInfo.count: ${message.viewerInfo?.count}")

@@ -6,6 +6,7 @@ plugins {
 android {
     namespace = "com.example.messagesdksampleapp"
     compileSdk = 34
+    buildFeatures.buildConfig = true
 
     defaultConfig {
         applicationId = "com.example.messagesdksampleapp"
@@ -15,6 +16,8 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "MESSAGE_SDK_VERSION", "\"1.3.2\"")
     }
 
     buildTypes {
