@@ -4,6 +4,7 @@ import android.icu.text.SimpleDateFormat
 import android.icu.util.TimeZone
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import com.blendvision.chat.messaging.common.presentation.CustomCounter
 import com.blendvision.chat.messaging.common.presentation.MessageException
 import com.blendvision.chat.messaging.common.presentation.MessageInfo
@@ -88,10 +89,12 @@ class ChatroomPresenter(
     }
 
     fun sendCustomMessage(customMessage: String) {
+        Log.i(TAG, "sendCustomMessage: $customMessage")
         messageManager.publishCustomMessage(customMessage)
     }
 
     fun sendCountableCustomMessage(key: String, value: String? = null) {
+        Log.i(TAG, "sendCountableCustomMessage: key = $key, value = $value")
         messageManager.publishCountableCustomMessage(key, value)
     }
 
@@ -189,5 +192,9 @@ class ChatroomPresenter(
 
     override fun onGetMessagesSuccess(messages: List<MessageInfo>) {
         listener?.onGetMessagesSuccess(messages)
+    }
+
+    companion object {
+        private const val TAG = "ChatroomPresenter"
     }
 }
