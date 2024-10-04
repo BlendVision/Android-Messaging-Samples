@@ -17,7 +17,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField("String", "MESSAGE_SDK_VERSION", "\"1.3.2\"")
+        buildConfigField("String", "MESSAGE_SDK_VERSION", "\"1.3.3\"")
     }
 
     buildTypes {
@@ -28,7 +28,7 @@ android {
         }
 
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
