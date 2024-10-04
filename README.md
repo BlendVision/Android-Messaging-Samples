@@ -35,7 +35,7 @@ dependencyResolutionManagement {
 
 ```groovy
 dependencies {
-  implementation 'com.blendvision.chat:messaging:1.3.0'
+  implementation 'com.blendvision.chat:messaging:1.3.3'
 }
 ```
 
@@ -245,3 +245,8 @@ messageManager.getChatHistory(beforeAt, limit, afterAt, fromOldest)
 messageManager.getMessages(beforeAt, limit, afterAt, fromOldest)
 
 ```
+
+## Proguard
+To use the message sdk in released build. Please add contents in [integration-side-proguard-rules.pro][1] to your app's proguard rules file.
+
+[1]: ./proguard/integration-side-proguard-rules.pro

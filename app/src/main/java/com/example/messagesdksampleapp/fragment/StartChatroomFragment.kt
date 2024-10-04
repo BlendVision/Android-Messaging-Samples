@@ -92,6 +92,16 @@ class StartChatroomFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        textChatRoomToken?.setText(
+            //QA
+            ""
+            // PRDO
+        )
+        textRefreshToken?.setText(
+            //QA
+            ""
+            //Prod
+        )
         buttonConnect?.setOnClickListener(connectButtonOnClickListener)
     }
 }
