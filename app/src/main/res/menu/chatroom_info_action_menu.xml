@@ -40,4 +40,10 @@
         android:icon="@drawable/selector_square_3"
         android:title="@string/blocked_users"
         android:visible="false" />
+
+    <item
+        android:id="@+id/chatroom_filter_message"
+        android:enabled="true"
+        android:icon="@drawable/selector_square_2"
+        android:title="@string/filter_message" />
 </menu>
