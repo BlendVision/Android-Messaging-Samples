@@ -25,6 +25,7 @@ class ChatroomPresenter(
     batchInterval: Long? = null
 ) : MessageListener, EventListener {
     private var listener: ChatroomPresenterListener? = null
+    private var types: Array<String>? = null
     var connectionState: ConnectionState = ConnectionState.CONNECTING
     private var messageManager = BVMessageManager.Builder(chatRoomToken, refreshToken)
         .setEventListener(this)
@@ -36,12 +37,13 @@ class ChatroomPresenter(
     private val handler = Handler(Looper.getMainLooper())
     private val getMessagesRunnable = object : Runnable {
         override fun run() {
-            getMessages()
+            getMessages(types)
             handler.postDelayed(this, 3000L)
         }
     }
 
-    fun startGettingMessagesPeriodically() {
+    fun startGettingMessagesPeriodically(types: Array<String>? = null) {
+        this.types = types
         handler.post(getMessagesRunnable)
     }
 
@@ -58,10 +60,12 @@ class ChatroomPresenter(
     }
 
     fun connectChatroom() {
+        Log.i(TAG, "connectChatroom")
         messageManager.connect()
     }
 
     fun disconnectChatroom() {
+        Log.i(TAG, "disconnectChatroom")
         messageManager.disconnect()
     }
 
@@ -126,7 +130,7 @@ class ChatroomPresenter(
         messageManager.refreshToken()
     }
 
-    private fun getMessages() {
+    private fun getMessages(types: Array<String>?) {
         val currentTimeMillis = System.currentTimeMillis()
         val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
         dateFormat.timeZone = TimeZone.getTimeZone("UTC")
@@ -137,7 +141,8 @@ class ChatroomPresenter(
             beforeAt = current,
             afterAt = halfMinutesAgo,
             limit = 100,
-            fromOldest = true
+            fromOldest = true,
+            types = types
         )
     }
 

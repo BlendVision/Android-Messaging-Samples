@@ -60,4 +60,7 @@
     <string name="batch_interval_title">Batch Custom Message Count Interval</string>
     <string name="batch_interval_field_hint">Please input batch interval (ms).</string>
     <string name="message_sdk_version">Message SDK Version: %s</string>
+    <string name="filter_message">Filter message</string>
+    <string name="none">None</string>
+
 </resources>
