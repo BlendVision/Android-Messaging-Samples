@@ -17,7 +17,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField("String", "MESSAGE_SDK_VERSION", "\"1.3.3\"")
+        buildConfigField("String", "MESSAGE_SDK_VERSION", "\"1.4.0\"")
     }
 
     buildTypes {
@@ -48,6 +48,9 @@ android {
             excludes += "/META-INF/*"
         }
     }
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 dependencies {
@@ -68,4 +71,7 @@ dependencies {
     implementation("com.hivemq:hivemq-mqtt-client:1.3.3")
     implementation("com.hivemq:hivemq-mqtt-client-websocket:1.3.3")
     implementation("com.auth0.android:jwtdecode:2.0.2")
+    implementation("androidx.fragment:fragment-ktx:1.8.4")
+
+    implementation(kotlin("reflect"))
 }
