@@ -183,6 +183,16 @@ class ChatroomFragment(chatRoomToken: String,
                         return@setOnMenuItemClickListener true
                     }
 
+                    R.id.chatroom_filter_message -> {
+                        (activity as MainActivity?)?.replaceFragments(
+                            this, MessageFilterFragment(
+                                presenter = presenter,
+                                chatroomFragment = this
+                            ), true
+                        )
+                        return@setOnMenuItemClickListener true
+                    }
+
                     else -> return@setOnMenuItemClickListener false
                 }
             }
@@ -238,6 +248,7 @@ class ChatroomFragment(chatRoomToken: String,
     }
 
     override fun onDestroy() {
+        Log.i(FRAGMENT, "onDestroy")
         presenter.unbind()
         presenter.disconnectChatroom()
         presenter.stopGettingMessagesPeriodically()

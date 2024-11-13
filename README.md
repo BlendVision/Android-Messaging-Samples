@@ -35,7 +35,7 @@ dependencyResolutionManagement {
 
 ```groovy
 dependencies {
-  implementation 'com.blendvision.chat:messaging:1.3.3'
+  implementation 'com.blendvision.chat:messaging:1.4.0'
 }
 ```
 
@@ -239,10 +239,10 @@ messageManager.updateViewerInfo(enabled, customName)
 messageManager.updateUser(customName)
 
 // When get chat history is successful, will be received in the `onGetChatHistorySuccess` method.
-messageManager.getChatHistory(beforeAt, limit, afterAt, fromOldest)
+messageManager.getChatHistory(beforeAt, limit, afterAt, fromOldest, types)
 
 // When get message is successful, will be received in the `onGetMessagesSuccess` method.
-messageManager.getMessages(beforeAt, limit, afterAt, fromOldest)
+messageManager.getMessages(beforeAt, limit, afterAt, fromOldest, types)
 
 ```
 
