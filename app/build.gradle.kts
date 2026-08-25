@@ -69,7 +69,6 @@ dependencies {
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     implementation("com.hivemq:hivemq-mqtt-client:1.3.3")
-    implementation("com.hivemq:hivemq-mqtt-client-websocket:1.3.3")
     implementation("com.auth0.android:jwtdecode:2.0.2")
     implementation("androidx.fragment:fragment-ktx:1.8.4")
 
